@@ -30,7 +30,8 @@ int main(){
       printf("Received Correct input : %s\n" , stringToSend);
    }
    if (ret == 0){
-      printf("Received Wrong input : %s\n" , stringToSend);
+      perror("invalid value \n");
+      return errno ; 
    }
 
    printf("Press ENTER to read back from the device...\n");
