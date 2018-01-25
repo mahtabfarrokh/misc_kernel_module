@@ -1,0 +1,51 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<errno.h>
+#include<fcntl.h>
+#include<string.h>
+#include<unistd.h>
+ 
+#define BUFFER_LENGTH 256               ///< The buffer length (crude but fine)
+static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
+ 
+int main(){
+   int ret, fd;
+   char stringToSend[BUFFER_LENGTH];
+   printf("I suggest to open the kernel log to see what's happening : sudo tail -f /var/log/kern.log\n");
+   printf("Starting device test code example...\n");
+   fd = open("/dev/oslab", O_RDWR);             // Open the device with read/write access
+   if (fd < 0){
+      perror("Failed to open the device...");
+      return errno;
+   }
+   printf("Type in a short string to send to the kernel module:\n");
+   scanf("%[^\n]%*c", stringToSend);                // Read in a string (with spaces)
+   printf("Writing message to the device [%s].\n", stringToSend);
+   ret = write(fd, stringToSend, strlen(stringToSend)); // Send the string to the LKM
+   if (ret < 0){
+      perror("Failed to write the message to the device.");
+      return errno;
+   }
+   if (ret == 1){
+      printf("Received Correct input : %s\n" , stringToSend);
+   }
+   if (ret == 0){
+      printf("Received Wrong input : %s\n" , stringToSend);
+   }
+
+   printf("Press ENTER to read back from the device...\n");
+   getchar();
+ 
+   printf("Reading from the device...\n");
+   ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
+   if (ret < 0){
+      perror("Failed to read the message from the device.");
+      return errno;
+   }
+   if (ret == 1){
+      printf("mahtab Farrokh :D\n");
+   }
+   printf("End of the program\n");
+   return 0;
+}
+
